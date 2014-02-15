@@ -72,11 +72,14 @@ function Particle(point, velocity, acceleration, color) {
   this.position = point || new Vector(0, 0);
   this.velocity = velocity || new Vector(0, 0);
   this.acceleration = acceleration || new Vector(0, 0);
-  this.color = color || "#999";
+  this.color = color || "#090";
 }
 
 Particle.prototype.move = function () {
   // Add our current acceleration to our current velocity
+  this.acceleration.x -= this.velocity.x * 0.09; //air resistance
+  this.acceleration.y -= this.velocity.y * 0.09;  //air resistance
+
   this.velocity.add(this.acceleration);
  
   // Add our current velocity to our position
@@ -120,6 +123,13 @@ function Emitter(point, velocity, spread) {
   this.drawColor = "#999"; // So we can tell them apart from Fields later
 }
 
+
+function randomRGB()
+{
+  return String('rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')');
+}
+
+
 Emitter.prototype.emitParticle = function() {
   // Use an angle randomized over the spread so we have more of a "spray"
   var angle = this.velocity.getAngle() + this.spread - (Math.random() * this.spread * 2);
@@ -133,7 +143,7 @@ Emitter.prototype.emitParticle = function() {
   // New velocity based off of the calculated angle and magnitude
   var velocity = Vector.fromAngle(angle, magnitude);
 
-  var thecolor = 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')';
+  var thecolor = randomRGB();
   
   //thecolor = 'rgb(0,255,0)'
 
@@ -143,7 +153,7 @@ Emitter.prototype.emitParticle = function() {
 
 // Add one emitter located at `{ x : 100, y : 230}` from the origin (top left)
 // that emits at a velocity of `2` shooting out from the right (angle `0`)
-var emitters = [new Emitter(new Vector(canvas.width/2, 300), Vector.fromAngle(270*(Math.PI/180), 2), 0.9)];
+var emitters = [new Emitter(new Vector(canvas.width/2, 300), Vector.fromAngle(270*(Math.PI/180), 2), 4)];
 /////-----end of Emitter properties-------////
 
 
@@ -151,16 +161,29 @@ var emitters = [new Emitter(new Vector(canvas.width/2, 300), Vector.fromAngle(27
 function addNewParticles() {
   // if we're at our max, stop emitting.
   if (particles.length > maxParticles) return;
- 
+  
+  for (var i=0; i<maxParticles; i++)
+  {
+
+    //var thecolor = 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')';
+    
+    var thecolor = 'rgb(0,255,0)';
+    var theposition = new Vector((Math.random()*canvas.width), (Math.random()*canvas.height));
+
+    var theParticle = new Particle(theposition, 0, thecolor);
+
+    particles.push(theParticle);
+  }
+
   // for each emitter
-  for (var i = 0; i < emitters.length; i++) {
+  /*for (var i = 0; i < emitters.length; i++) {
  
     // for [emissionRate], emit a particle
     for (var j = 0; j < emissionRate; j++) {
       particles.push(emitters[i].emitParticle());
     }
  
-  }
+  }*/
 }
 
 //Calculates where new particles are supposed to be and updates 'particle' array
@@ -173,10 +196,10 @@ function plotParticles(boundsX, boundsY) {
     var pos = particle.position;
  
     // If we're out of bounds, drop this particle and move on to the next
-    if (pos.x < 0 || pos.x > boundsX || pos.y < 0 || pos.y > boundsY) continue;
+    //if (pos.x < 0 || pos.x > boundsX || pos.y < 0 || pos.y > boundsY) continue;
  	
 
- 	particle.submitToFields(fields);
+ 	  particle.submitToFields(fields);
     // Move our particles
     particle.move();
  
@@ -211,8 +234,9 @@ Field.prototype.setMass = function(mass) {
   this.drawColor = mass < 0 ? "#f00" : "#0f0";
 }
 
-var fields = [new Field(new Vector(600, 230), -0.1), new Field(new Vector(0, 0), 30)];
+var fields = [new Field(new Vector(0, 0), 150)];
 /////-----end of Field properties-------////
+
 
 function drawCircle(object) {
   ctx.fillStyle = object.drawColor;
@@ -229,7 +253,7 @@ function clear() {
 
 //update particle system
 function update() {
-	addNewParticles();
+
 	plotParticles(canvas.width, canvas.height);
 }
 
@@ -242,7 +266,7 @@ function draw() {
 
 
  canvas.addEventListener('mousemove', function(e) {
-    fields[1].position = new Vector(e.clientX, e.clientY);
+    fields[0].position = new Vector(e.clientX, e.clientY);
 
   }, false);
 
@@ -252,6 +276,7 @@ function loop() {
   update();
   draw();
   queue();
+  console.log(particles.length);
 }
 
 //request to do animation then run the function loop again. ~60 times per sec
@@ -260,6 +285,7 @@ function queue() {
 }
 
 //runs the rendering loop
+addNewParticles();
 loop();
 
  }
