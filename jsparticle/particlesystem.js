@@ -135,7 +135,7 @@ Emitter.prototype.emitParticle = function() {
 
   var thecolor = 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')';
   
-  thecolor = 'rgb(0,255,0)'
+  //thecolor = 'rgb(0,255,0)'
 
   // return our new Particle!
   return new Particle(position,velocity, 0, thecolor);
