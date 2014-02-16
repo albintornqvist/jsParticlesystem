@@ -20,6 +20,10 @@ var emissionRate = 4; // how many particles are emitted each frame
 var particleSize = 1;
 
 var objectSize = 2;
+
+var dragcoeff = 0.05;
+
+var gravity = 80;
 /////--------------------------/////
 
 
@@ -77,8 +81,8 @@ function Particle(point, velocity, acceleration, color) {
 
 Particle.prototype.move = function () {
   // Add our current acceleration to our current velocity
-  this.acceleration.x -= this.velocity.x * 0.09; //air resistance
-  this.acceleration.y -= this.velocity.y * 0.09;  //air resistance
+  this.acceleration.x -= this.velocity.x * dragcoeff; //air resistance
+  this.acceleration.y -= this.velocity.y * dragcoeff;  //air resistance
 
   this.velocity.add(this.acceleration);
  
@@ -153,7 +157,7 @@ Emitter.prototype.emitParticle = function() {
 
 // Add one emitter located at `{ x : 100, y : 230}` from the origin (top left)
 // that emits at a velocity of `2` shooting out from the right (angle `0`)
-var emitters = [new Emitter(new Vector(canvas.width/2, 300), Vector.fromAngle(270*(Math.PI/180), 2), 4)];
+var emitters = [];//[new Emitter(new Vector(canvas.width/2, 300), Vector.fromAngle(270*(Math.PI/180), 2), 4)];
 /////-----end of Emitter properties-------////
 
 
@@ -167,10 +171,10 @@ function addNewParticles() {
 
     //var thecolor = 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')';
     
-    var thecolor = 'rgb(0,255,0)';
+    var particlecolor = '#0000FF';
     var theposition = new Vector((Math.random()*canvas.width), (Math.random()*canvas.height));
 
-    var theParticle = new Particle(theposition, 0, thecolor);
+    var theParticle = new Particle(theposition, 0, 0, particlecolor);
 
     particles.push(theParticle);
   }
@@ -234,7 +238,7 @@ Field.prototype.setMass = function(mass) {
   this.drawColor = mass < 0 ? "#f00" : "#0f0";
 }
 
-var fields = [new Field(new Vector(0, 0), 150)];
+var fields = [new Field(new Vector(0, 0), gravity)];
 /////-----end of Field properties-------////
 
 
@@ -276,7 +280,6 @@ function loop() {
   update();
   draw();
   queue();
-  console.log(particles.length);
 }
 
 //request to do animation then run the function loop again. ~60 times per sec
