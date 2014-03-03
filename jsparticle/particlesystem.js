@@ -21,9 +21,9 @@ var particleSize = 1;
 
 var objectSize = 2;
 
-var dragcoeff = 0.09;
+var dragcoeff = 0.04;
 
-var gravity = 100;
+var gravity = 150;
 /////--------------------------/////
 
 
